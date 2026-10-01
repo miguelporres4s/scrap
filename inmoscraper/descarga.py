@@ -33,6 +33,7 @@ _SENALES_BLOQUEO = (
     "awswaf",
     "captcha-delivery",
     "px-captcha",
+    "account-verification",
     "are you a robot",
     "<title>access denied</title>",
 )
@@ -42,8 +43,13 @@ class Bloqueado(Exception):
     """El portal devolvió una página de desafío / anti-bot."""
 
 
-def parece_bloqueo(status: int, html: str) -> bool:
+_URLS_BLOQUEO = ("account-verification", "/captcha", "/challenge", "/gz/login")
+
+
+def parece_bloqueo(status: int, html: str, url: str = "") -> bool:
     if status in (202, 403, 429, 503):
+        return True
+    if any(u in url.lower() for u in _URLS_BLOQUEO):
         return True
     cabeza = html[:5000].lower()
     return any(s in cabeza for s in _SENALES_BLOQUEO)
@@ -123,8 +129,8 @@ class Descargador:
                 time.sleep(2**intento)
                 continue
             r.encoding = r.encoding or r.apparent_encoding
-            if parece_bloqueo(r.status_code, r.text):
-                raise Bloqueado(f"HTTP {r.status_code} en {url}")
+            if parece_bloqueo(r.status_code, r.text, r.url):
+                raise Bloqueado(f"HTTP {r.status_code} en {url}" + (f" (redirigido a {r.url[:80]})" if r.url != url else ""))
             if r.status_code == 404:
                 return ""
             if r.status_code >= 500:
@@ -179,7 +185,7 @@ class Descargador:
                 resp = pagina.goto(url, wait_until="domcontentloaded", timeout=self.a.timeout * 1000)
                 status = resp.status if resp else 200
                 html = pagina.content()
-                if parece_bloqueo(status, html):
+                if parece_bloqueo(status, html, pagina.url):
                     html = self._esperar_desafio(pagina)
                 if esperar_selector:
                     try:
@@ -210,7 +216,7 @@ class Descargador:
         while time.monotonic() < limite:
             pagina.wait_for_timeout(2000)
             html = pagina.content()
-            if not parece_bloqueo(200, html):
+            if not parece_bloqueo(200, html, pagina.url):
                 return html
         raise Bloqueado(f"Sigue bloqueado tras esperar: {pagina.url}")
 

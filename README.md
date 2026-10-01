@@ -45,6 +45,54 @@ Los resultados quedan en `resultados/AAAA-MM-DD/`:
 | `todas_las_zonas.xlsx` | hoja *Resumen* (anuncios, precio mediano por zona) + una hoja por zona |
 | `resumen.json` | estado de cada zona (`ok`, `parcial`, `bloqueado`, `error`) |
 
+## Proyectos (hoja "Proyectos Entregar"): un Excel por proyecto, cada zona se descarga una sola vez
+
+`proyectos.yaml` contiene los proyectos de la hoja **ya sin repetidos** (p. ej. Cap Cana y Costa Pacífica
+aparecían 2 veces; MILEX y ARTEC comparten Torreón; SMA lo usan 2 proyectos). Las descargas se identifican
+por URL: si dos proyectos o zonas comparten una fuente, se baja **una vez** y el Excel de cada proyecto
+replica esa información.
+
+```bash
+python -m inmoscraper proyectos --plan                  # qué se va a bajar, sin descargar (79 descargas distintas)
+python -m inmoscraper proyectos --pais PA --pais RD     # primero Panamá y República Dominicana
+python -m inmoscraper proyectos                         # todo, ordenado por prioridad
+python -m inmoscraper proyectos --fichas                # + ficha de detalle de cada anuncio (lento; se reanuda)
+python -m inmoscraper proyectos --fichas --max-fichas 500
+python -m inmoscraper proyectos --solo-excel            # regenera los Excel con lo ya descargado
+```
+
+Resultado en `resultados/proyectos/`:
+
+| archivo | contenido |
+|---|---|
+| `00_indice_proyectos.xlsx` | hoja *Proyectos* (anuncios por proyecto) y *Zonas únicas* (qué se descargó una vez y qué proyectos lo usan) |
+| `<folio>_<proyecto>.xlsx` | *Resumen* (alcance, fuentes, estado de cada una), *Lista de precios* (precio, m², **precio por m²**, recámaras…), *Hoteles* (Booking) y *Ficha completa* |
+
+La hoja *Resumen* marca en **rojo** una fuente que falló/bloqueó y en **amarillo** una con 0 anuncios o URL
+"por verificar": un Excel vacío casi siempre significa bloqueo, no que no haya inventario.
+Se puede interrumpir y relanzar: continúa donde se quedó (`datos/estado.json`, `datos/fichas.jsonl`).
+
+### Portales por país
+
+| país | vivienda | hoteles |
+|---|---|---|
+| **Panamá** | `icasas.com.pa` (verificado: apartamentos, casas, lotes-terrenos, residenciales/proyectos, alquiler) + Mercado Libre Panamá | Booking |
+| **Rep. Dominicana** | Mercado Libre RD + **SuperCasas** (adaptador verificado; pega el link con el sector elegido) | Booking |
+| **México** | `icasas.mx` (verificado) + Mercado Libre México | Booking |
+
+`icasas` **no opera en República Dominicana ni en Perú** y no tiene categoría de lotes/terrenos en México
+(sí en Panamá). Airbnb no se toca.
+
+### Mercado Libre y Booking: correr en tu equipo
+
+Ambos bloquean IP de servidores (Mercado Libre redirige a `/gz/account-verification`, Booking a un desafío).
+En tu PC normalmente funcionan: el modo `auto` prueba HTTP y, si hay verificación, abre Chrome (ventana
+visible; si pide captcha lo resuelves una vez y se guarda en `.perfil_navegador/`).
+Las URLs de Mercado Libre del YAML llevan `verificar: true` porque no pude abrirlas desde el entorno de
+desarrollo; si una trae 0 anuncios, abre el link en el navegador, ajústalo a la URL real de la búsqueda y relanza.
+Mercado Libre corta cada búsqueda en ~2,000 resultados (42 páginas): si una zona lo alcanza, divídela por tipo o
+por rango de precio con varias fuentes.
+
 ## Dar de alta tus 28 zonas
 
 Edita `zonas.yaml`. Por cada zona: entra al portal, filtra (operación, tipo,
@@ -67,7 +115,9 @@ Cambiar de zona o de portal = cambiar el link. Antes de lanzar las 28, usa
 
 | portal | países | modo | estado |
 |---|---|---|---|
-| **icasas** | MX | http | verificado contra el sitio real |
+| **icasas** | MX, PA | http | verificado contra el sitio real (icasas.mx e icasas.com.pa) |
+| **SuperCasas** | RD | http | verificado contra el sitio real |
+| **Mercado Libre** | MX, PA, DO, AR, CO, CL, PE... | auto | **sin verificar** (bloqueado desde el servidor de desarrollo); usar `probar` |
 | **Navent**: inmuebles24, zonaprop, imovelweb, urbania, adondevivir, plusvalia, compreoalquile | MX, AR, BR, PE, EC, PA | navegador | probado con HTML de ejemplo; **verificar con `probar`** |
 | **booking.com** | todos | navegador | probado con HTML de ejemplo; **verificar con `probar`** |
 | **genérico** | cualquiera | auto | lee JSON-LD / microdatos schema.org y sigue el enlace "siguiente" |

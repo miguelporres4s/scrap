@@ -1,0 +1,311 @@
+# Catálogo de proyectos (de "Proyectos Entregar - Hoja 1"), SIN repetidos.
+# Cada zona se descarga UNA sola vez aunque la usen varios proyectos; el Excel de
+# cada proyecto replica la información de sus zonas.
+#
+#   python -m inmoscraper proyectos --plan                 # qué se va a descargar (no descarga)
+#   python -m inmoscraper proyectos --pais PA --pais RD    # solo Panamá y Rep. Dominicana
+#   python -m inmoscraper proyectos                        # todo, por prioridad
+#   python -m inmoscraper proyectos --fichas               # + ficha de detalle de cada anuncio
+#   python -m inmoscraper proyectos --solo-excel           # regenera Excel con lo ya descargado
+#
+# Fuentes por portal:
+#   icasas (MX):  portal: icasas, estado, municipio, operaciones: [venta, renta], tipos: [...]
+#   icasas (PA):  portal: icasas, lugar: arraijan|panama-oeste|panama|chorrera|chame|capira|..., tipos: [...]
+#   cualquier otro: portal: mercadolibre|booking|supercasas|..., url: <link copiado del navegador>
+#   verificar: true -> la URL no se pudo comprobar contra el sitio real; revisa que traiga anuncios
+#                      (se marca en amarillo en el Excel si vienen 0).
+
+ajustes:
+  modo: auto
+  pausa: [2, 4]
+  max_paginas: 200
+  datos: datos            # descargas intermedias (CSV por fuente, caché de fichas)
+  salida: resultados      # aquí quedan los Excel: resultados/proyectos/
+  navegador:
+    headless: false
+    canal: chrome
+    espera_desafio: 90
+
+zonas:
+  # =========================== PANAMÁ (prioridad) ===========================
+  pa-costa-pacifica:
+    nombre: Costa Pacífica - Veracruz / Arraiján (Panamá Oeste)
+    pais: PA
+    fuentes:
+      - {portal: icasas, lugar: arraijan, operaciones: [venta], tipos: [apartamentos, casas, lotes-terrenos, residenciales]}
+      - {portal: icasas, lugar: arraijan, operaciones: [alquiler], tipos: [apartamentos, casas]}
+      - {portal: mercadolibre, etiqueta: ML apartamentos venta Costa Pacífica, operacion: venta, tipo: apartamentos, verificar: true, url: "https://inmuebles.mercadolibre.com.pa/apartamentos/venta/costa-pacifica"}
+      - {portal: mercadolibre, etiqueta: ML casas venta Costa Pacífica, operacion: venta, tipo: casas, verificar: true, url: "https://inmuebles.mercadolibre.com.pa/casas/venta/costa-pacifica"}
+      - {portal: mercadolibre, etiqueta: ML apartamentos venta Arraiján, operacion: venta, tipo: apartamentos, verificar: true, url: "https://inmuebles.mercadolibre.com.pa/apartamentos/venta/panama-oeste/arraijan/"}
+      - {portal: mercadolibre, etiqueta: ML casas venta Arraiján, operacion: venta, tipo: casas, verificar: true, url: "https://inmuebles.mercadolibre.com.pa/casas/venta/panama-oeste/arraijan/"}
+      - {portal: mercadolibre, etiqueta: ML terrenos venta Arraiján, operacion: venta, tipo: terrenos, verificar: true, url: "https://inmuebles.mercadolibre.com.pa/terrenos/venta/panama-oeste/arraijan/"}
+
+  # ===================== REPÚBLICA DOMINICANA (prioridad) =====================
+  rd-cap-cana:
+    nombre: Cap Cana (Punta Cana, La Altagracia)
+    pais: RD
+    fuentes:
+      - {portal: mercadolibre, etiqueta: ML apartamentos venta Cap Cana, operacion: venta, tipo: apartamentos, verificar: true, url: "https://inmuebles.mercadolibre.com.do/apartamentos/venta/cap-cana"}
+      - {portal: mercadolibre, etiqueta: ML casas y villas venta Cap Cana, operacion: venta, tipo: casas, verificar: true, url: "https://inmuebles.mercadolibre.com.do/casas/venta/cap-cana"}
+      - {portal: mercadolibre, etiqueta: ML terrenos venta Cap Cana, operacion: venta, tipo: terrenos, verificar: true, url: "https://inmuebles.mercadolibre.com.do/terrenos/venta/cap-cana"}
+      # SuperCasas: entra a https://www.supercasas.com/buscar/ , elige tipo/operación y el sector "Cap Cana",
+      # copia el link resultante y descomenta (el filtro de sector va en el link, no se puede inferir):
+      # - {portal: supercasas, etiqueta: SuperCasas Cap Cana apartamentos venta, operacion: venta, tipo: apartamentos, url: "https://www.supercasas.com/buscar/?..."}
+
+  # ================================ MÉXICO ====================================
+  gdl-tlajomulco:
+    nombre: Tlajomulco de Zúñiga, Jalisco
+    pais: MX
+    fuentes: [{portal: icasas, estado: jalisco, municipio: tlajomulco-zuniga, operaciones: [venta], tipos: [casas, casas-condominio, casas-fraccionamiento, departamentos]}]
+  gdl-tonala:
+    nombre: Tonalá, Jalisco
+    pais: MX
+    fuentes: [{portal: icasas, estado: jalisco, municipio: tonala, operaciones: [venta], tipos: [casas, casas-condominio, casas-fraccionamiento, departamentos]}]
+  gdl-jocotepec:
+    nombre: Jocotepec, Jalisco
+    pais: MX
+    fuentes: [{portal: icasas, estado: jalisco, municipio: jocotepec, operaciones: [venta], tipos: [casas, casas-condominio, casas-fraccionamiento, departamentos]}]
+  gdl-chapala:
+    nombre: Chapala, Jalisco
+    pais: MX
+    fuentes: [{portal: icasas, estado: jalisco, municipio: chapala, operaciones: [venta], tipos: [casas, casas-condominio, casas-fraccionamiento, departamentos]}]
+
+  cdmx-reforma:
+    nombre: CDMX - corredor Reforma (Cuauhtémoc y Miguel Hidalgo) - renta de departamentos
+    pais: MX
+    fuentes:
+      - {portal: icasas, estado: distrito-federal, municipio: cuauhtemoc, operaciones: [renta], tipos: [departamentos]}
+      - {portal: icasas, estado: distrito-federal, municipio: miguel-hidalgo, operaciones: [renta], tipos: [departamentos]}
+  cdmx-reforma-locales:
+    nombre: CDMX - corredor Reforma - locales comerciales en renta
+    pais: MX
+    fuentes:
+      - {portal: icasas, estado: distrito-federal, municipio: cuauhtemoc, operaciones: [renta], tipos: [locales]}
+      - {portal: icasas, estado: distrito-federal, municipio: miguel-hidalgo, operaciones: [renta], tipos: [locales]}
+  cdmx-ccla:
+    nombre: CDMX - alcaldías centrales - renta de departamentos y casas
+    pais: MX
+    fuentes:
+      # Cuauhtémoc y Miguel Hidalgo ya están en cdmx-reforma: se descargan una sola vez.
+      - {portal: icasas, estado: distrito-federal, municipio: cuauhtemoc, operaciones: [renta], tipos: [departamentos]}
+      - {portal: icasas, estado: distrito-federal, municipio: miguel-hidalgo, operaciones: [renta], tipos: [departamentos]}
+      - {portal: icasas, estado: distrito-federal, municipio: benito-juarez, operaciones: [renta], tipos: [departamentos, casas]}
+      - {portal: icasas, estado: distrito-federal, municipio: coyoacan, operaciones: [renta], tipos: [departamentos, casas]}
+      - {portal: icasas, estado: distrito-federal, municipio: alvaro-obregon, operaciones: [renta], tipos: [departamentos, casas]}
+      - {portal: icasas, estado: distrito-federal, municipio: cuajimalpa-morelos, operaciones: [renta], tipos: [departamentos, casas]}
+
+  metepec:
+    nombre: Metepec, Edomex (oferta indirecta Senior Living)
+    pais: MX
+    fuentes: [{portal: icasas, estado: mexico, municipio: metepec, operaciones: [venta], tipos: [casas, casas-condominio, departamentos]}]
+
+  qro:
+    nombre: Querétaro (Querétaro, Corregidora, El Marqués)
+    pais: MX
+    fuentes:
+      - {portal: icasas, estado: queretaro, municipio: santiago-queretaro, operaciones: [venta], tipos: [casas, casas-condominio, casas-fraccionamiento, departamentos]}
+      - {portal: icasas, estado: queretaro, municipio: corregidora, operaciones: [venta], tipos: [casas, casas-condominio, casas-fraccionamiento, departamentos]}
+      - {portal: icasas, estado: queretaro, municipio: marques, operaciones: [venta], tipos: [casas, casas-condominio, casas-fraccionamiento, departamentos]}
+  sma:
+    nombre: San Miguel de Allende, Guanajuato
+    pais: MX
+    fuentes: [{portal: icasas, estado: guanajuato, municipio: san-miguel-allende, operaciones: [venta], tipos: [casas, casas-condominio, departamentos]}]
+  sma-hoteles:
+    nombre: San Miguel de Allende - hoteles (Booking)
+    pais: MX
+    fuentes:
+      - {portal: booking, etiqueta: Booking SMA, max_paginas: 1, url: "https://www.booking.com/searchresults.es.html?ss=San+Miguel+de+Allende%2C+Guanajuato&checkin=2026-11-13&checkout=2026-11-15&group_adults=2&no_rooms=1&nflt=ht_id%3D204", verificar: true}
+
+  cancun-pdc:
+    nombre: Cancún y Playa del Carmen, Quintana Roo
+    pais: MX
+    fuentes:
+      - {portal: icasas, estado: quintana-roo, municipio: cancun, operaciones: [venta], tipos: [casas, casas-condominio, departamentos]}
+      - {portal: icasas, estado: quintana-roo, municipio: benito-juarez, operaciones: [venta], tipos: [casas, casas-condominio, departamentos]}
+      - {portal: icasas, estado: quintana-roo, municipio: playa-carmen, operaciones: [venta], tipos: [casas, casas-condominio, departamentos]}
+      - {portal: icasas, estado: quintana-roo, municipio: playacar, operaciones: [venta], tipos: [casas, departamentos]}
+  cancun-hoteles:
+    nombre: Cancún - hoteles (Booking)
+    pais: MX
+    fuentes:
+      - {portal: booking, etiqueta: Booking Cancún, max_paginas: 1, url: "https://www.booking.com/searchresults.es.html?ss=Canc%C3%BAn%2C+Quintana+Roo&checkin=2026-11-13&checkout=2026-11-15&group_adults=2&no_rooms=1&nflt=ht_id%3D204", verificar: true}
+
+  merida-comercial:
+    nombre: Mérida, Yucatán - locales comerciales
+    pais: MX
+    fuentes:
+      - {portal: icasas, estado: yucatan, municipio: merida, operaciones: [venta, renta], tipos: [locales]}
+
+  torreon-industrial:
+    nombre: Torreón, Coahuila - naves industriales (icasas no publica lotes industriales)
+    pais: MX
+    fuentes:
+      - {portal: icasas, estado: coahuila, municipio: torreon, operaciones: [venta], tipos: [naves]}
+
+  nl-santiago:
+    nombre: "Santiago, Nuevo León (SUPUESTO: folio NRE; confirmar)"
+    pais: MX
+    fuentes: [{portal: icasas, estado: nuevo-leon, municipio: santiago, operaciones: [venta], tipos: [casas, casas-condominio, casas-fraccionamiento]}]
+
+proyectos:
+  # ---------------------------- Panamá y RD primero ----------------------------
+  - folios: [4SR-PAN-02590]
+    nombre: COSTA PACIFICA
+    pais: PA
+    prioridad: 1
+    alcance: "Estudio de Oferta Histórica: Horizontal y Vertical. (Módulos de no-compra y demanda exploratoria: Costa Pacífica / Carmel, torre de interés preferencial < 60 m² y < USD 120,000)."
+    notas: "Aparece 2 veces en la hoja; se descarga una vez. La 'oferta histórica' requiere repetir la corrida cada mes y comparar (cada corrida se guarda con su fecha_scrape)."
+    zonas: [pa-costa-pacifica]
+
+  - folios: [4SR-RDO-02605]
+    nombre: CAP CANA - MINIARIA
+    pais: RD
+    prioridad: 1
+    responsable: Mario
+    alcance: "Estudio de Oferta: Vertical, Horizontal y Lotes. Referencia: estudio Rosewood (mismo estudio, actualizar datos)."
+    notas: "Aparece 2 veces (CAP CANA - MINIARIA y (OFERTA) CAP CANA - MINIARIA); se descarga una vez. La hoja dice 'REVISAR CON MARIO'."
+    zonas: [rd-cap-cana]
+
+  # --------------------------------- México -----------------------------------
+  - folios: [4SR-OCC-02641]
+    nombre: BANORTE-GDL
+    pais: MX
+    prioridad: 3
+    alcance: "Oferta de vivienda horizontal/vertical hasta $2 MDP y horizontal $2-5 MDP en Tlajomulco, Tonalá 1 y 2, Jocotepec y Chapala."
+    zonas: [gdl-tlajomulco, gdl-tonala, gdl-jocotepec, gdl-chapala]
+
+  - folios: [4SR-SER-02625]
+    nombre: CANCÚN COUNTRY CLUB
+    pais: MX
+    prioridad: 3
+    alcance: "Oferta: vivienda vertical y horizontal en venta (CUN y PDC), oferta formal + Big Data de oferta informal/reventa; panorama turístico y análisis hotelero Cancún (Business class)."
+    notas: "Aparece 2 veces. El texto del análisis hotelero Cancún está cortado en la hoja; se asumió que pertenece a este folio (confirmar)."
+    zonas: [cancun-pdc, cancun-hoteles]
+
+  - folios: [4SR-BAJ-02631]
+    nombre: ST REGIS - SMA
+    pais: MX
+    prioridad: 3
+    responsable: Jorge
+    alcance: "Oferta: Vertical, Horizontal, Branded Residences, Hotel (Booking; sin Airbnb)."
+    zonas: [sma, sma-hoteles]
+
+  - folios: [4SR-BAJ-02634]
+    nombre: SUPRATERRA - SMA
+    pais: MX
+    prioridad: 3
+    responsable: Jorge
+    alcance: "Oferta anual general de SMA: vivienda horizontal, vertical, lotes residenciales, macrolotes habitacionales/comerciales/usos mixtos."
+    notas: "Lotes y macrolotes no están en icasas (no tiene esa categoría en México); se cubren con otras fuentes."
+    zonas: [sma]
+
+  - folios: [4SR-BAJ-02633]
+    nombre: SUPRATERRA QRO 2026
+    pais: MX
+    prioridad: 3
+    responsable: Jorge
+    alcance: "Oferta general de QRO por etapas y zonas: vivienda horizontal, vertical, lotes y macrolotes."
+    notas: "Lotes y macrolotes no están en icasas."
+    zonas: [qro]
+
+  - folios: [4SR-CDM-02122]
+    nombre: CCLA - CDMX
+    pais: MX
+    prioridad: 3
+    responsable: Deyanira
+    alcance: "Demanda de vivienda en renta $12,000-$20,000/mes; oferta informal (Big Data) y patrimonial."
+    zonas: [cdmx-ccla]
+
+  - folios: [4SR-CDM-02648]
+    nombre: REFORMA 322
+    pais: MX
+    prioridad: 3
+    responsable: Deyanira
+    alcance: "Oferta: vertical en renta (Big Data oferta informal), comparativo actual vs histórico."
+    zonas: [cdmx-reforma]
+
+  - folios: [4SR-CDM-02587]
+    nombre: QUIERO CASA - REFORMA
+    pais: MX
+    prioridad: 3
+    responsable: Deyanira
+    alcance: "Oferta: vivienda vertical en renta y locales comerciales en renta."
+    zonas: [cdmx-reforma, cdmx-reforma-locales]
+
+  - folios: [4SR-CDM-02628]
+    nombre: SENIOR LIVING METEPEC
+    pais: MX
+    prioridad: 4
+    responsable: Deyanira
+    alcance: "Oferta indirecta Senior Living en ZM + benchmark nacional; demanda con encuesta 4S."
+    notas: "Aparece como (DEMANDA) y (OFERTA); un solo proyecto. Los proyectos de senior living no se publican en estos portales: aquí solo va la vivienda de contexto."
+    zonas: [metepec]
+
+  - folios: [4SR-SER-02573]
+    nombre: PREDIO AV. CHENKÚ, MÉRIDA
+    pais: MX
+    prioridad: 4
+    alcance: "Oferta: comercio + Big Data; estimación de capacidad comercial."
+    notas: "Aparece 2 veces."
+    zonas: [merida-comercial]
+
+  - folios: [4SR-NRE-02638, 4SR-NRE-02640]
+    nombre: MIELERAS INDUSTRIAL MILEX + ARTEC POCKET PARK TORREÓN
+    pais: MX
+    prioridad: 4
+    responsable: Bremer
+    alcance: "Actualización de estudio de oferta de lotes industriales (La Laguna / Torreón)."
+    notas: "MILEX aparece 2 veces y comparte zona con ARTEC (Torreón): se agrupan y se descarga una vez."
+    zonas: [torreon-industrial]
+
+  - folios: [4SR-NRE-02232]
+    nombre: TERRARIO SANTIAGO
+    pais: MX
+    prioridad: 4
+    responsable: Bremer
+    alcance: "Oferta horizontal; demanda de vivienda horizontal ticket $12-15 MDP."
+    notas: "UBICACIÓN SUPUESTA (Santiago, N.L.). Confirmar."
+    zonas: [nl-santiago]
+
+  # --------- Sin trabajo de portales (el alcance no pide oferta de portales o falta info) ---------
+  - folios: [4SR-OCC-02636]
+    nombre: GRUPO IGUSA - SOLANA
+    pais: MX
+    prioridad: 9
+    alcance: "Validación de producto: preventa simulada digital. Polígono de 79,928 m² dentro de 154,710.49 m²."
+    notas: "No requiere datos de portales."
+    zonas: []
+
+  - folios: [4SR-SER-02476]
+    nombre: FONTANA MÉRIDA
+    pais: MX
+    prioridad: 9
+    alcance: "Estudio de demanda: vivienda horizontal con preferencias comerciales (8 semanas)."
+    notas: "Solo demanda (encuestas)."
+    zonas: []
+
+  - folios: [4SR-PER-02624]
+    nombre: LOS INCAS 498
+    pais: PE
+    prioridad: 9
+    responsable: Valentina
+    alcance: "Demanda: vivienda vertical, 70 encuestas efectivas; bonus Ciudaris (predefinición de producto en 5 días). Estimación de demanda por giro (vivienda vertical, comercio y oficinas)."
+    notas: "Ubicación no indicada (folio PER). Confirmar ciudad para agregar zona (icasas no opera en Perú; usar Mercado Libre Perú)."
+    zonas: []
+
+  - folios: [4SR-NRE-02650]
+    nombre: OV HÉCTOR MARROQUÍN
+    pais: MX
+    prioridad: 9
+    responsable: Bremer
+    alcance: "Opinión de valor: oficinas y comercio; parámetros de oferta informal (Big Data) en la zona de influencia."
+    notas: "Ubicación no indicada. Confirmar para agregar zona."
+    zonas: []
+
+  - folios: [4SR-PER-02646]
+    nombre: SENDA - AV. UNIVERSITARIA
+    pais: PE
+    prioridad: 9
+    responsable: Valentina
+    alcance: "(sin alcance definido en la hoja)"
+    zonas: []

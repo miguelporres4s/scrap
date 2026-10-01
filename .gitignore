@@ -5,3 +5,8 @@ __pycache__/
 resultados/
 .perfil_navegador/
 *.tmp
+datos/
+resultados/
+datos_pa/
+resultados_pa/
+.perfil_navegador/

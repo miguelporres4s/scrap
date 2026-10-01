@@ -108,7 +108,7 @@ def parse_caracteristicas(textos: list[str]) -> dict[str, float]:
             res.setdefault("recamaras", n)
         elif re.search(r"ba[ñn]o|banheiro|bath", low):
             res.setdefault("banos", n)
-        elif re.search(r"estac|garage|cochera|parking|vaga|cajon|caj[óo]n", low):
+        elif re.search(r"estac|garage|cochera|parking|parqueo|vaga|cajon|caj[óo]n", low):
             res.setdefault("estacionamientos", n)
     return res
 

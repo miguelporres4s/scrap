@@ -23,6 +23,7 @@ from .descarga import AjustesDescarga, Descargador
 from .ejecutor import Zona, scrapear_zonas
 from .exportar import consolidar
 from .portales import cargar_config_portales, detectar, soportados
+from . import proyectos as pr
 
 RAIZ = Path.cwd()
 
@@ -128,6 +129,55 @@ def cmd_probar(args) -> int:
     return 0
 
 
+def cmd_proyectos(args) -> int:
+    """Catálogo de proyectos: scrapea cada zona única una vez y genera un Excel por proyecto."""
+    from .excel_proyectos import escribir_excels
+
+    cat = pr.cargar_catalogo(args.archivo)
+    sel = pr.seleccionar(cat, [x for v in (args.pais or []) for x in v.split(",")], args.solo)
+    if not sel:
+        print("Ningún proyecto coincide con los filtros.", file=sys.stderr)
+        return 1
+    ajustes = _ajustes(cat.ajustes, args)
+    base = Path(args.datos or cat.ajustes.get("datos", "datos"))
+    salida = Path(args.salida or cat.ajustes.get("salida", "resultados")) / "proyectos"
+    portales = cargar_config_portales(args.portales)
+    unicas = pr.zonas_unicas(sel)
+    print(f"{len(sel)} proyectos -> {len(unicas)} zonas únicas (cada una se scrapea una sola vez)")
+    if args.plan:
+        usos: dict[str, tuple] = {}
+        for clave, ps in unicas.items():
+            for u in cat.unidades(clave):
+                usos.setdefault(u.id, (u, set()))[1].update(p.folios[0] for p in ps)
+        for uid, (u, folios) in usos.items():
+            print(f"  {uid[:70]:70} {'[verificar]' if u.verificar else '':12} {', '.join(sorted(folios))}")
+        print(f"\n{len(usos)} descargas distintas")
+        return 0
+    with Descargador(ajustes) as desc:
+        if not args.solo_excel:
+            pr.ejecutar_listados(cat, sel, ajustes, base, reanudar=not args.rehacer,
+                                 max_paginas=args.max_paginas or cat.ajustes.get("max_paginas", 200),
+                                 config_portales=portales, desc=desc)
+            if args.fichas:
+                pr.ejecutar_fichas(cat, sel, ajustes, base, max_fichas=args.max_fichas,
+                                   config_portales=portales, desc=desc)
+    archivos = escribir_excels(cat, sel, base, salida)
+    est = pr.Estado(base)
+    print("\nEstado de las fuentes")
+    mostradas = set()
+    for clave in unicas:
+        for u in cat.unidades(clave):
+            if u.id in mostradas:
+                continue
+            mostradas.add(u.id)
+            e = est.datos.get(u.id, {})
+            print(f"  {u.id[:62]:62} {e.get('anuncios', 0):>6} anuncios  {e.get('estado', 'sin ejecutar'):12} {e.get('detalle', '')[:50]}")
+    print(f"\nExcel generados en {salida}/:")
+    for a in archivos:
+        print("  ", a.name)
+    return 0
+
+
 def cmd_portales(args) -> int:
     for nombre, dominios, modo in soportados(cargar_config_portales(args.portales)):
         print(f"{nombre:16} {modo:18} {dominios}")
@@ -179,6 +229,19 @@ def construir_parser() -> argparse.ArgumentParser:
     t.add_argument("--guardar-html")
     comunes(t, con_salida=False)
     t.set_defaults(func=cmd_probar)
+
+    pj = sub.add_parser("proyectos", help="catálogo de proyectos: una zona = una sola descarga, un Excel por proyecto")
+    pj.add_argument("archivo", nargs="?", default="proyectos.yaml")
+    pj.add_argument("--pais", action="append", help="solo estos países, p. ej. --pais PA --pais RD (o PA,RD)")
+    pj.add_argument("--solo", action="append", help="solo proyectos cuyo nombre/folio contenga este texto")
+    pj.add_argument("--plan", action="store_true", help="solo muestra qué se va a scrapear, sin descargar")
+    pj.add_argument("--fichas", action="store_true", help="además descarga la ficha de detalle de cada anuncio (lento)")
+    pj.add_argument("--max-fichas", type=int, help="tope de fichas por corrida (se reanuda con la caché)")
+    pj.add_argument("--solo-excel", action="store_true", help="no descarga nada, regenera los Excel con lo ya descargado")
+    pj.add_argument("--rehacer", action="store_true", help="vuelve a scrapear fuentes ya completas")
+    pj.add_argument("--datos", help="carpeta de datos intermedios (default: datos)")
+    comunes(pj)
+    pj.set_defaults(func=cmd_proyectos)
 
     ps = sub.add_parser("portales", help="lista portales soportados")
     ps.add_argument("--portales", default=str(RAIZ / "portales.yaml"))

@@ -11,9 +11,11 @@ from .base import Portal
 from .booking import Booking
 from .generico import Generico
 from .icasas import Icasas
+from .mercadolibre import MercadoLibre
 from .navent import Navent
+from .supercasas import SuperCasas
 
-ADAPTADORES: list[type[Portal]] = [Icasas, Navent, Booking]
+ADAPTADORES: list[type[Portal]] = [Icasas, MercadoLibre, SuperCasas, Navent, Booking]
 
 
 def cargar_config_portales(ruta: Optional[str | Path]) -> dict[str, dict[str, Any]]:

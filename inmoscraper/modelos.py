@@ -32,6 +32,7 @@ class Anuncio:
     calificacion: Optional[float] = None
     descripcion: str = ""
     extra: dict[str, Any] = field(default_factory=dict)
+    ficha: dict[str, Any] = field(default_factory=dict)  # detalle completo (segunda pasada)
     # Se rellenan en el runner
     zona: str = ""
     pais: str = ""
@@ -48,6 +49,7 @@ class Anuncio:
     def fila(self) -> dict[str, Any]:
         d = asdict(self)
         d["extra"] = json.dumps(self.extra, ensure_ascii=False) if self.extra else ""
+        d["ficha"] = json.dumps(self.ficha, ensure_ascii=False) if self.ficha else ""
         return d
 
 

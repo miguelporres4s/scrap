@@ -40,6 +40,13 @@ class Portal:
         """Número de páginas si el portal lo informa (opcional)."""
         return None
 
+    selector_ficha: Optional[str] = None  # selector que indica que la página de detalle cargó
+
+    def parsear_ficha(self, html: str, url: str) -> dict:
+        """Datos completos de la página de detalle de un anuncio. Por defecto
+        lee JSON-LD/título/descripción; los adaptadores lo enriquecen."""
+        return ficha_generica(self.sopa(html))
+
     def acciones_navegador(self) -> Optional[Callable]:
         """Acciones extra en el navegador antes de leer el HTML (scroll, 'ver más')."""
         return None
@@ -80,3 +87,27 @@ def con_parametro(url: str, clave: str, valor) -> str:
     if valor is not None:
         q.append((clave, str(valor)))
     return urlunparse(p._replace(query=urlencode(q)))
+
+
+def ficha_generica(soup: BeautifulSoup) -> dict:
+    import json
+    ficha: dict = {}
+    h1 = soup.select_one("h1")
+    if h1:
+        ficha["titulo_completo"] = limpiar(h1.get_text(" "))
+    meta = soup.select_one("meta[name=description], meta[property='og:description']")
+    if meta and meta.get("content"):
+        ficha["descripcion_completa"] = limpiar(meta["content"])
+    for sc in soup.select("script[type='application/ld+json']"):
+        try:
+            data = json.loads(sc.string or "")
+        except (json.JSONDecodeError, TypeError):
+            continue
+        for d in data if isinstance(data, list) else [data]:
+            if isinstance(d, dict) and d.get("@type") not in (None, "BreadcrumbList", "Organization", "WebSite"):
+                if d.get("description"):
+                    ficha["descripcion_completa"] = limpiar(str(d["description"]))
+                for k in ("name", "category", "sku", "datePublished", "dateModified"):
+                    if d.get(k):
+                        ficha[f"jsonld_{k}"] = limpiar(str(d[k]))
+    return ficha
