@@ -64,11 +64,32 @@ class InmoPanama(Portal):
         return res
 
     def parsear_ficha(self, html: str, url: str) -> dict:
-        from .base import ficha_generica
         soup = self.sopa(html)
-        f = ficha_generica(soup)
-        for tr in soup.select("table tr, .ib-detail-row"):
-            celdas = [limpiar(x.get_text(" ")) for x in tr.select("td, th, span")]
-            if len(celdas) >= 2 and celdas[0] and len(celdas[0]) < 40:
-                f.setdefault(celdas[0].rstrip(":").lower(), celdas[1])
+        f: dict = {"titulo_completo": self.texto(soup, "h1.nb-prop-title, h1"),
+                   "operacion_anuncio": self.texto(soup, ".nb-badge-op"),
+                   "zona_ph": self.texto(soup, ".nb-prop-location-line")}
+        for c in soup.select(".nb-quick-fact-cell"):
+            k, v = self.texto(c, ".nb-quick-fact-label"), self.texto(c, ".nb-quick-fact-value")
+            if k and v and v.lower() != "consultar":
+                f[k.lower()] = v
+        for c in soup.select(".nb-prop-detail-item"):
+            k, v = self.texto(c, ".nb-prop-detail-label"), self.texto(c, ".nb-prop-detail-value")
+            if k and v:
+                f[k.rstrip(":").lower()] = v
+        for c in soup.select(".nb-prop-date-item"):
+            k, v = self.texto(c, ".nb-prop-date-label"), self.texto(c, ".nb-prop-date-value")
+            if k and v:
+                f[k.rstrip(":").lower()] = v
+        d = soup.select_one(".nb-desc-full-content") or soup.select_one(".nb-desc-preview")
+        if d:
+            f["descripcion_completa"] = self.texto(d)
+        am = [self.texto(x) for x in soup.select(".nb-amenity-item")]
+        if am:
+            f["amenidades"] = ", ".join(am)
+        ag = self.texto(soup, ".nb-agent-name")
+        if ag:
+            f["anunciante"] = ag
+        lic = self.texto(soup, ".nb-agent-license")
+        if lic:
+            f["licencia_corredor"] = lic
         return {k: v for k, v in f.items() if v}

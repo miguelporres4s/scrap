@@ -170,3 +170,12 @@ def test_gruposucasa_lista_de_precios():
     assert casa.extra["letra_quincenal_desde"] == 688 and casa.extra["ingreso_requerido_desde"] == 4650
     assert casa.extra["bono_lanzamiento"] == "$500 + 1,500." and casa.extra["estado_proyecto"] == "Preventa"
     assert (apto.tipo, apto.precio, apto.estacionamientos, apto.extra["deposito"]) == ("Apartamento", 177769, 2, 1)
+
+
+def test_inmopanama_ficha():
+    from inmoscraper.portales.inmopanama import InmoPanama
+    f = InmoPanama("https://www.inmopanama.com/x").parsear_ficha(
+        (FIX / "inmopanama_detalle.html").read_text(encoding="utf-8"), "https://www.inmopanama.com/x")
+    assert f["id"] == "#155636" and f["precio"].startswith("$2,300") and f["habitaciones"] == "3"
+    assert f["publicado el"] == "21/08/2026" and "Piscina Exterior" in f["amenidades"]
+    assert f["descripcion_completa"].endswith("MLS") and "…" not in f["descripcion_completa"]
