@@ -1,0 +1,46 @@
+# Lista de zonas a scrapear. Cada zona = un link de listado de un portal
+# (copiado del navegador DESPUÉS de aplicar los filtros que quieras:
+# operación, tipo de inmueble, precio, etc.). El portal se detecta por dominio.
+#
+#   python -m inmoscraper zonas zonas.yaml                 # todas
+#   python -m inmoscraper zonas zonas.yaml --solo tulum    # solo las que contengan "tulum"
+#   python -m inmoscraper zonas zonas.yaml --reanudar      # continúa una corrida cortada
+
+ajustes:
+  modo: auto            # auto (cada portal usa su modo) | http | navegador
+  pausa: [2, 5]         # segundos aleatorios entre páginas (sé amable con los portales)
+  max_paginas: 200      # tope de seguridad por zona
+  salida: resultados    # se crea resultados/AAAA-MM-DD/
+  navegador:
+    headless: false     # false = ventana visible; ayuda a pasar Cloudflare y resolver captchas
+    canal: chrome       # usa tu Google Chrome instalado (más difícil de detectar). Quita la línea para usar Chromium de Playwright
+    espera_desafio: 90  # segundos para resolver un captcha a mano
+
+zonas:
+  # --- Ejemplos: reemplaza por tus 28 zonas -------------------------------
+  - nombre: MX - CDMX Benito Juárez - deptos renta
+    pais: MX
+    url: https://www.icasas.mx/renta/habitacionales-departamentos-distrito-federal-benito-juarez-2_3_1_0_266_0
+
+  - nombre: MX - Guadalajara - deptos renta
+    pais: MX
+    url: https://www.icasas.mx/renta/habitacionales-departamentos-jalisco-guadalajara-2_3_14_0_568_0
+
+  - nombre: MX - CDMX Benito Juárez - deptos venta (inmuebles24)
+    pais: MX
+    url: https://www.inmuebles24.com/departamentos-en-venta-en-benito-juarez.html
+
+  - nombre: AR - Palermo - deptos venta
+    pais: AR
+    url: https://www.zonaprop.com.ar/departamentos-venta-palermo.html
+
+  - nombre: MX - Tulum - hospedaje (booking)
+    pais: MX
+    # Incluye fechas en el link para que Booking muestre precios
+    url: https://www.booking.com/searchresults.es.html?ss=Tulum&checkin=2026-11-10&checkout=2026-11-12&group_adults=2
+    max_paginas: 1      # Booking carga todo con "Cargar más" en una sola página
+
+  # Opciones por zona:
+  #   portal: icasas|navent|booking|generico|<nombre en portales.yaml>  (forzar adaptador)
+  #   modo: http|navegador
+  #   max_paginas: 50

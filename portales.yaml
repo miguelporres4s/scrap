@@ -1,0 +1,30 @@
+# Portales extra SIN programar: define selectores CSS de la tarjeta de cada
+# anuncio y de sus campos. Sintaxis: "selector" (texto) o "selector@atributo".
+# "@atributo" solo = atributo de la propia tarjeta.
+#
+# Para encontrar los selectores:
+#   python -m inmoscraper probar "<link>" --guardar-html pagina.html
+# y abre pagina.html (o usa "Inspeccionar" en el navegador).
+#
+# Si un portal NO está aquí ni tiene adaptador propio, se usa el modo genérico
+# automático (datos estructurados JSON-LD / microdatos + enlace "siguiente").
+
+# Ejemplo (plantilla, ajusta los selectores al HTML real del portal):
+# lamudi:
+#   dominios: [lamudi.com.mx]
+#   modo: http                 # http | navegador | auto
+#   moneda: MXN                # moneda por defecto si el precio no la indica
+#   operacion: venta
+#   tarjeta: "div.snippet"
+#   id: "@data-idanuncio"
+#   campos:
+#     titulo: ".snippet__content__title"
+#     url: "a@href"
+#     precio: ".snippet__content__price"
+#     ubicacion: ".snippet__content__location"
+#     caracteristicas: ".snippet__content__properties span"   # m2 / recámaras / baños se infieren
+#   paginacion:
+#     parametro: page          # ?page=2, ?page=3 ...
+#     # inicio: 1  paso: 1     # p. ej. offset: {parametro: offset, inicio: 0, paso: 20}
+#     # ruta: "{base}/p_{n}"   # alternativa: paginación en la ruta
+#     # siguiente: "a.next@href"  # alternativa: seguir el botón "siguiente"
