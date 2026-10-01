@@ -32,25 +32,33 @@ zonas:
     nombre: Costa Pacífica - Veracruz / Arraiján (Panamá Oeste)
     pais: PA
     fuentes:
+      # Oferta de portal: icasas Panamá (verificado)
       - {portal: icasas, lugar: arraijan, operaciones: [venta], tipos: [apartamentos, casas, lotes-terrenos, residenciales]}
       - {portal: icasas, lugar: arraijan, operaciones: [alquiler], tipos: [apartamentos, casas]}
-      - {portal: mercadolibre, etiqueta: ML apartamentos venta Costa Pacífica, operacion: venta, tipo: apartamentos, verificar: true, url: "https://inmuebles.mercadolibre.com.pa/apartamentos/venta/costa-pacifica"}
-      - {portal: mercadolibre, etiqueta: ML casas venta Costa Pacífica, operacion: venta, tipo: casas, verificar: true, url: "https://inmuebles.mercadolibre.com.pa/casas/venta/costa-pacifica"}
-      - {portal: mercadolibre, etiqueta: ML apartamentos venta Arraiján, operacion: venta, tipo: apartamentos, verificar: true, url: "https://inmuebles.mercadolibre.com.pa/apartamentos/venta/panama-oeste/arraijan/"}
-      - {portal: mercadolibre, etiqueta: ML casas venta Arraiján, operacion: venta, tipo: casas, verificar: true, url: "https://inmuebles.mercadolibre.com.pa/casas/venta/panama-oeste/arraijan/"}
-      - {portal: mercadolibre, etiqueta: ML terrenos venta Arraiján, operacion: venta, tipo: terrenos, verificar: true, url: "https://inmuebles.mercadolibre.com.pa/terrenos/venta/panama-oeste/arraijan/"}
+      # Oferta de portal: InmoPanama, Arraiján (venta y alquiler mezclados; la columna Operación los distingue)
+      - {portal: inmopanama, etiqueta: InmoPanama Arraiján, url: "https://www.inmopanama.com/propiedades-arraijan?sort=newest"}
+      # Lista de precios del desarrollador (Grupo Sucasa): el propio Costa Pacífica y proyectos competidores del Sector Oeste
+      - {portal: gruposucasa, etiqueta: Costa Pacífica (PH Carmel), url: "https://gruposucasa.com/proyectos/sector-oeste/costa-pacifica/"}
+      - {portal: gruposucasa, etiqueta: PH Mar Pacífico (La Chorrera), url: "https://gruposucasa.com/proyectos/sector-oeste/ph-mar-pacifico/"}
+      - {portal: gruposucasa, etiqueta: Verde Mar 2 (La Chorrera), url: "https://gruposucasa.com/proyectos/sector-oeste/verde-mar-2/"}
+      # Mercado Libre Panamá: bloqueado desde el servidor de desarrollo. Descomenta para correrlo en tu equipo:
+      # - {portal: mercadolibre, etiqueta: ML apartamentos venta Arraiján, operacion: venta, tipo: apartamentos, verificar: true, url: "https://inmuebles.mercadolibre.com.pa/apartamentos/venta/panama-oeste/arraijan/"}
+      # - {portal: mercadolibre, etiqueta: ML casas venta Arraiján, operacion: venta, tipo: casas, verificar: true, url: "https://inmuebles.mercadolibre.com.pa/casas/venta/panama-oeste/arraijan/"}
 
   # ===================== REPÚBLICA DOMINICANA (prioridad) =====================
   rd-cap-cana:
     nombre: Cap Cana (Punta Cana, La Altagracia)
     pais: RD
     fuentes:
-      - {portal: mercadolibre, etiqueta: ML apartamentos venta Cap Cana, operacion: venta, tipo: apartamentos, verificar: true, url: "https://inmuebles.mercadolibre.com.do/apartamentos/venta/cap-cana"}
-      - {portal: mercadolibre, etiqueta: ML casas y villas venta Cap Cana, operacion: venta, tipo: casas, verificar: true, url: "https://inmuebles.mercadolibre.com.do/casas/venta/cap-cana"}
-      - {portal: mercadolibre, etiqueta: ML terrenos venta Cap Cana, operacion: venta, tipo: terrenos, verificar: true, url: "https://inmuebles.mercadolibre.com.do/terrenos/venta/cap-cana"}
-      # SuperCasas: entra a https://www.supercasas.com/buscar/ , elige tipo/operación y el sector "Cap Cana",
-      # copia el link resultante y descomenta (el filtro de sector va en el link, no se puede inferir):
-      # - {portal: supercasas, etiqueta: SuperCasas Cap Cana apartamentos venta, operacion: venta, tipo: apartamentos, url: "https://www.supercasas.com/buscar/?..."}
+      # rentahouserd.com: todo lo que está en venta en Cap Cana (ln=87257): apartamentos, villas, penthouses, terrenos, locales...
+      - {portal: rentahouserd, etiqueta: Rentahouse Cap Cana (todos los tipos), operacion: venta, url: "https://www.rentahouserd.com/properties/republica-dominicana/la-altagracia/punta-cana?ln=87257&sort_by=published_at-desc"}
+      # Otros sitios EasyBroker de RD con la misma plantilla (descomenta para ampliar; ojo: se repiten propiedades entre inmobiliarias):
+      # - {portal: inmobiliarianaco, etiqueta: Inmobiliaria Naco Cap Cana, url: "https://www.inmobiliarianaco.net/properties/republica-dominicana/la-altagracia/punta-cana?ln=87257"}
+      # - {portal: rdcondominio, etiqueta: RD Condominio Cap Cana, url: "https://www.rdcondominio.com/properties/republica-dominicana/la-altagracia/punta-cana?ln=87257"}
+      # SuperCasas (pega el link del buscador con el sector Cap Cana):
+      # - {portal: supercasas, etiqueta: SuperCasas Cap Cana, url: "https://www.supercasas.com/buscar/?..."}
+      # Mercado Libre RD: bloqueado desde el servidor de desarrollo:
+      # - {portal: mercadolibre, etiqueta: ML apartamentos venta Cap Cana, operacion: venta, tipo: apartamentos, verificar: true, url: "https://inmuebles.mercadolibre.com.do/apartamentos/venta/cap-cana"}
 
   # ================================ MÉXICO ====================================
   gdl-tlajomulco:

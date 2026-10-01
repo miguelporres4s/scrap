@@ -23,7 +23,7 @@ PRECIOS = [  # (encabezado, clave, ancho)
     ("Sup. m²", "superficie_m2", 9), ("Sup. total m²", "superficie_total_m2", 11),
     ("Precio por m²", "precio_m2", 13), ("Recámaras", "recamaras", 10), ("Baños", "banos", 8),
     ("Estac.", "estacionamientos", 8), ("Ubicación", "ubicacion", 34), ("Anunciante", "anunciante", 26),
-    ("Link", "url", 50), ("Fecha scrape", "fecha_scrape", 20),
+    ("Alerta", "alerta", 30), ("Link", "url", 50), ("Fecha scrape", "fecha_scrape", 20),
 ]
 HOTELES = [
     ("Zona", "zona_nombre", 26), ("Hotel / alojamiento", "titulo", 46), ("Tipo", "tipo", 20),
@@ -38,6 +38,7 @@ FICHA_BASE = [
     ("Tipo", "tipo", 16), ("Título", "titulo", 44), ("Precio", "precio", 14), ("Moneda", "moneda", 8),
     ("Precio por m²", "precio_m2", 13), ("Sup. m²", "superficie_m2", 9), ("Sup. total m²", "superficie_total_m2", 11),
     ("Recámaras", "recamaras", 10), ("Baños", "banos", 8), ("Estac.", "estacionamientos", 8),
+    ("Alerta", "alerta", 30),
     ("Ubicación", "ubicacion", 32), ("Dirección", "direccion", 28), ("Lat", "lat", 10), ("Lon", "lon", 10),
     ("Anunciante", "anunciante", 24), ("Descripción (listado)", "descripcion", 40), ("Link", "url", 50),
 ]
@@ -50,12 +51,30 @@ def _num(v: Any) -> Optional[float]:
         return None
 
 
+def _alerta(fila: dict, precio, sup, pm2) -> str:
+    """Marca (sin borrar) datos probablemente erróneos del anunciante, para filtrarlos en Excel."""
+    if not precio:
+        return "sin precio"
+    venta = fila.get("operacion") == "venta"
+    avisos = []
+    if venta and precio < 5000 and fila.get("moneda") in ("USD", "EUR", ""):
+        avisos.append("precio de venta atípico (muy bajo)")
+    if venta and precio > 50_000_000:
+        avisos.append("precio de venta atípico (muy alto)")
+    if venta and pm2 and (pm2 < 30 or pm2 > 60_000):
+        avisos.append("precio por m² atípico")
+    return "; ".join(avisos)
+
+
 def _enriquecer(fila: dict, u: Unidad, cat: Catalogo, fichas: CacheFichas) -> dict:
     fila = dict(fila)
     fila["zona_nombre"] = cat.zonas[u.zona].get("nombre", u.zona)
     fila["zona_clave"] = u.zona
-    p, s = _num(fila.get("precio")), _num(fila.get("superficie_m2"))
+    # precio por m²: sobre superficie construida; si el portal solo da la total (terrenos, EasyBroker) sobre esa
+    p = _num(fila.get("precio"))
+    s = _num(fila.get("superficie_m2")) or _num(fila.get("superficie_total_m2"))
     fila["precio_m2"] = round(p / s, 2) if p and s and s > 0 else None
+    fila["alerta"] = _alerta(fila, p, s, fila["precio_m2"])
     try:
         extra = json.loads(fila.get("extra") or "{}")
     except json.JSONDecodeError:

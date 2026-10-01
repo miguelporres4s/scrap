@@ -181,11 +181,13 @@ def ejecutar_listados(cat: Catalogo, proyectos: list[Proyecto], ajustes: Ajustes
 class CacheFichas:
     """datos/fichas.jsonl: una línea por URL ya descargada (permite reanudar)."""
 
-    def __init__(self, carpeta: Path):
-        self.ruta = carpeta / "fichas.jsonl"
+    def __init__(self, carpeta: Path, sufijo: str = ""):
+        # Cada proceso escribe en su propio archivo (fichas_<sufijo>.jsonl) y todos se leen juntos,
+        # así se pueden correr varios portales en paralelo sin pisarse.
+        self.ruta = carpeta / (f"fichas_{sufijo}.jsonl" if sufijo else "fichas.jsonl")
         self.datos: dict[str, dict] = {}
-        if self.ruta.exists():
-            for linea in self.ruta.read_text(encoding="utf-8").splitlines():
+        for ruta in sorted(carpeta.glob("fichas*.jsonl")):
+            for linea in ruta.read_text(encoding="utf-8").splitlines():
                 try:
                     d = json.loads(linea)
                     self.datos[d["url"]] = d["ficha"]
@@ -200,14 +202,16 @@ class CacheFichas:
 
 def ejecutar_fichas(cat: Catalogo, proyectos: list[Proyecto], ajustes: AjustesDescarga, carpeta: Path,
                     *, max_fichas: Optional[int] = None, config_portales: Optional[dict] = None,
-                    desc: Optional[Descargador] = None) -> CacheFichas:
-    cache = CacheFichas(carpeta)
+                    desc: Optional[Descargador] = None, solo_portal: Optional[str] = None) -> CacheFichas:
+    cache = CacheFichas(carpeta, slug(solo_portal) if solo_portal else "")
     urls: list[tuple[str, str]] = []
     vistas: set[str] = set()
     for clave in zonas_unicas(proyectos):
         for u in cat.unidades(clave):
-            if u.portal == "booking":
-                continue  # hoteles: la ficha de Booking ya viene en el listado
+            if u.portal in ("booking", "gruposucasa"):
+                continue  # hoteles y lista del desarrollador: ya vienen completos en el listado
+            if solo_portal and not u.id.startswith(solo_portal):
+                continue
             ruta = ruta_unidad(carpeta, u)
             if not ruta.exists():
                 continue

@@ -160,7 +160,7 @@ def cmd_proyectos(args) -> int:
                                  config_portales=portales, desc=desc)
             if args.fichas:
                 pr.ejecutar_fichas(cat, sel, ajustes, base, max_fichas=args.max_fichas,
-                                   config_portales=portales, desc=desc)
+                                   config_portales=portales, desc=desc, solo_portal=args.fichas_portal)
     archivos = escribir_excels(cat, sel, base, salida)
     est = pr.Estado(base)
     print("\nEstado de las fuentes")
@@ -236,6 +236,8 @@ def construir_parser() -> argparse.ArgumentParser:
     pj.add_argument("--solo", action="append", help="solo proyectos cuyo nombre/folio contenga este texto")
     pj.add_argument("--plan", action="store_true", help="solo muestra qué se va a scrapear, sin descargar")
     pj.add_argument("--fichas", action="store_true", help="además descarga la ficha de detalle de cada anuncio (lento)")
+    pj.add_argument("--fichas-portal", help="solo fichas de las fuentes cuyo id empiece así (p. ej. icasas-pa, rentahouserd); "
+                                            "permite correr varios portales en paralelo en terminales distintas")
     pj.add_argument("--max-fichas", type=int, help="tope de fichas por corrida (se reanuda con la caché)")
     pj.add_argument("--solo-excel", action="store_true", help="no descarga nada, regenera los Excel con lo ya descargado")
     pj.add_argument("--rehacer", action="store_true", help="vuelve a scrapear fuentes ya completas")

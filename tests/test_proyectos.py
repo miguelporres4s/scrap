@@ -117,3 +117,56 @@ proyectos:
         assert 100000 in fila and 500.0 in fila  # precio y precio por m²
     wi = load_workbook(tmp_path / "out" / "00_indice_proyectos.xlsx")
     assert wi["Zonas únicas"].max_row == 2 and "Proyecto A" in wi["Zonas únicas"]["G2"].value
+
+
+# ------------------------------------------------- DR / Panamá (HTML real recortado)
+def test_easybroker_rentahouserd():
+    from inmoscraper.portales.easybroker import EasyBroker, limpiar_url
+    sucia = ("https://www.rentahouserd.com/properties/republica-dominicana/la-altagracia/punta-cana?ln=87257"
+             "&sort_by=published_at-desc&https://www.rentahouserd.com/&gad_source=1&gad_campaignid=22&gbraid=0AAA&gclid=Cj0")
+    assert limpiar_url(sucia).endswith("punta-cana?ln=87257&sort_by=published_at-desc")
+    p = detectar(sucia)
+    assert isinstance(p, EasyBroker) and p.nombre == "rentahouserd"
+    assert p.url_pagina(1).endswith("sort_by=published_at-desc") and p.url_pagina(3).endswith("&page=3")
+    html = (FIX / "rentahouserd_listado.html").read_text(encoding="utf-8")
+    a, b, c = p.parsear(html, p.url_base)
+    assert a.id.startswith("EB-") and a.url.startswith("https://www.rentahouserd.com/property/")
+    assert (a.precio, a.moneda, a.operacion) == (576479.0, "USD", "venta")
+    assert (a.tipo, a.recamaras, a.banos, a.superficie_total_m2) == ("Apartamento", 2, 3, 149.81)
+    assert a.lat and a.lon and a.extra["clave_interna"] == "MOARI-2HAB"
+    assert p.total_paginas(p.sopa(html)) == 41
+
+
+def test_easybroker_ficha():
+    from inmoscraper.portales.easybroker import EasyBroker
+    f = EasyBroker("https://www.rentahouserd.com/x").parsear_ficha(
+        (FIX / "rentahouserd_detalle.html").read_text(encoding="utf-8"), "https://www.rentahouserd.com/x")
+    assert f["id"] == "EB-XC9556" and f["superficie cubierta"] == "130.84 m²" and f["mantenimiento"] == "$605 USD"
+    assert f["orientación"] == "Este" and f["condición"] == "Nuevo"
+    assert "MOARI" in f["descripcion_completa"] and "Piscina" in f["caracteristicas"]
+
+
+def test_inmopanama():
+    from inmoscraper.portales.inmopanama import InmoPanama
+    p = detectar("https://www.inmopanama.com/propiedades-arraijan")
+    assert isinstance(p, InmoPanama) and p.url_pagina(3).endswith("propiedades-arraijan?page=3")
+    html = (FIX / "inmopanama_listado.html").read_text(encoding="utf-8")
+    anuncios = p.parsear(html, p.url_base)
+    assert len(anuncios) == 3
+    a = anuncios[0]
+    assert a.id == "142146" and a.url.endswith("_p-142146.htm") and a.moneda == "USD"
+    assert (a.precio, a.operacion, a.tipo, a.recamaras, a.banos, a.superficie_m2) == (435000.0, "venta", "Apartamento", 3, 3, 189)
+    assert p.total_paginas(p.sopa(html)) == 24
+
+
+def test_gruposucasa_lista_de_precios():
+    from inmoscraper.portales.gruposucasa import GrupoSucasa
+    url = "https://gruposucasa.com/proyectos/sector-oeste/costa-pacifica/"
+    p = detectar(url)
+    assert isinstance(p, GrupoSucasa) and p.url_pagina(2) == ""
+    casa, apto = p.parsear((FIX / "gruposucasa_proyecto.html").read_text(encoding="utf-8"), url)
+    assert (casa.tipo, casa.titulo) == ("Casa", "Casa Modelo California - PH Carmel junto al Mar")
+    assert (casa.precio, casa.recamaras, casa.banos, casa.superficie_total_m2, casa.superficie_m2) == (211501, 3, 2.5, 172.86, 127.61)
+    assert casa.extra["letra_quincenal_desde"] == 688 and casa.extra["ingreso_requerido_desde"] == 4650
+    assert casa.extra["bono_lanzamiento"] == "$500 + 1,500." and casa.extra["estado_proyecto"] == "Preventa"
+    assert (apto.tipo, apto.precio, apto.estacionamientos, apto.extra["deposito"]) == ("Apartamento", 177769, 2, 1)

@@ -9,13 +9,16 @@ import yaml
 
 from .base import Portal
 from .booking import Booking
+from .easybroker import EasyBroker
 from .generico import Generico
+from .gruposucasa import GrupoSucasa
 from .icasas import Icasas
+from .inmopanama import InmoPanama
 from .mercadolibre import MercadoLibre
 from .navent import Navent
 from .supercasas import SuperCasas
 
-ADAPTADORES: list[type[Portal]] = [Icasas, MercadoLibre, SuperCasas, Navent, Booking]
+ADAPTADORES: list[type[Portal]] = [Icasas, MercadoLibre, SuperCasas, EasyBroker, GrupoSucasa, InmoPanama, Navent, Booking]
 
 
 def cargar_config_portales(ruta: Optional[str | Path]) -> dict[str, dict[str, Any]]:

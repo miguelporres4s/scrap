@@ -83,6 +83,27 @@ Se puede interrumpir y relanzar: continúa donde se quedó (`datos/estado.json`,
 `icasas` **no opera en República Dominicana ni en Perú** y no tiene categoría de lotes/terrenos en México
 (sí en Panamá). Airbnb no se toca.
 
+### Fuentes verificadas para Panamá y República Dominicana
+
+| fuente | país | qué trae |
+|---|---|---|
+| `icasas.com.pa` | PA | apartamentos, casas, lotes, proyectos (residenciales), venta y alquiler |
+| `inmopanama.com` | PA | oferta de inmobiliarias por zona (usa `?sort=newest` para una paginación estable). **Ojo**: `/costa-pacifica` de este sitio es una torre de Punta Pacífica, no el proyecto de Veracruz |
+| `gruposucasa.com` | PA | lista de precios del **desarrollador** (modelo, áreas, precio desde, letra quincenal, ingreso requerido, bono) del proyecto Costa Pacífica y de PH Mar Pacífico / Verde Mar 2 |
+| `rentahouserd.com` (EasyBroker) | RD | todo lo que está en venta por sector (`ln=ID`); Cap Cana = `ln=87257`. El mismo adaptador sirve para casaspb, miscasasrd, rdcondominio, puntacanasolutions, inmobiliarianaco |
+| `supercasas.com` | RD | adaptador listo; pega el link del buscador con el sector elegido |
+
+La columna **Alerta** del Excel marca (sin borrar) precios o precios por m² atípicos que suelen ser errores de quien publica.
+
+Fichas en paralelo (una terminal por portal, ahorra tiempo):
+
+```bash
+python -m inmoscraper proyectos --pais PA --pais RD --fichas --fichas-portal rentahouserd
+python -m inmoscraper proyectos --pais PA --pais RD --fichas --fichas-portal icasas-pa
+python -m inmoscraper proyectos --pais PA --pais RD --fichas --fichas-portal inmopanama
+python -m inmoscraper proyectos --pais PA --pais RD --solo-excel     # al final, arma los Excel con todo
+```
+
 ### Mercado Libre y Booking: correr en tu equipo
 
 Ambos bloquean IP de servidores (Mercado Libre redirige a `/gz/account-verification`, Booking a un desafío).
