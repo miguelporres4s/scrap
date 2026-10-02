@@ -81,7 +81,8 @@ def _enriquecer(fila: dict, u: Unidad, cat: Catalogo, fichas: CacheFichas) -> di
         extra = {}
     fila["estrellas"] = extra.get("estrellas")
     fila["opiniones"] = extra.get("opiniones")
-    fila["_ficha"] = fichas.datos.get(fila.get("url", ""), {})
+    # Algunos portales (InfoCasas) traen la ficha completa en el propio listado
+    fila["_ficha"] = fichas.datos.get(fila.get("url", "")) or (extra.get("_ficha") if isinstance(extra, dict) else None) or {}
     return fila
 
 

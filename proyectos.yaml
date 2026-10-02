@@ -158,6 +158,20 @@ zonas:
       # Opcional, si la "zona de influencia" incluye San Pedro (principal polo de oficinas): descomenta
       # - {portal: icasas, estado: nuevo-leon, municipio: san-pedro-garza-garcia, operaciones: [venta, renta], tipos: [oficinas, locales]}
 
+  gto-leon:
+    nombre: León, Guanajuato
+    pais: MX
+    fuentes: [{portal: icasas, estado: guanajuato, municipio: leon-aldama, operaciones: [venta], tipos: [casas, casas-condominio, casas-fraccionamiento, departamentos]}]
+
+  # ================================ PERÚ ====================================
+  pe-lima:
+    nombre: Lima, Perú - departamentos en venta (InfoCasas; ubicación exacta de los proyectos pendiente)
+    pais: PE
+    fuentes:
+      # Lima completa son ~21,500 anuncios (1,026 págs). Se toman las primeras 100 págs (~2,100). Cuando se sepa el distrito,
+      # cambiar la URL por la del distrito (ej. .../venta/departamentos/lima/<distrito>) y subir max_paginas.
+      - {portal: infocasas, etiqueta: InfoCasas Lima departamentos venta, operacion: venta, tipo: departamentos, max_paginas: 100, url: "https://infocasas.com.pe/venta/departamentos/lima"}
+
   nl-santiago:
     nombre: "Santiago, Nuevo León (SUPUESTO: folio NRE; confirmar)"
     pais: MX
@@ -287,10 +301,10 @@ proyectos:
   - folios: [4SR-OCC-02636]
     nombre: GRUPO IGUSA - SOLANA
     pais: MX
-    prioridad: 9
+    prioridad: 4
     alcance: "Validación de producto: preventa simulada digital. Polígono de 79,928 m² dentro de 154,710.49 m²."
-    notas: "No requiere datos de portales."
-    zonas: []
+    notas: "León, Guanajuato (confirmado por el usuario). La preventa simulada no usa portales; se incluye la oferta de vivienda de León como contexto de precios. Solo listados (sin fichas): icasas limita a 100 páginas por búsqueda y las casas de León llegan a ese tope."
+    zonas: [gto-leon]
 
   - folios: [4SR-SER-02476]
     nombre: FONTANA MÉRIDA
@@ -303,11 +317,11 @@ proyectos:
   - folios: [4SR-PER-02624]
     nombre: LOS INCAS 498
     pais: PE
-    prioridad: 9
+    prioridad: 4
     responsable: Valentina
     alcance: "Demanda: vivienda vertical, 70 encuestas efectivas; bonus Ciudaris (predefinición de producto en 5 días). Estimación de demanda por giro (vivienda vertical, comercio y oficinas)."
-    notas: "Perú; ubicación exacta pendiente (el usuario la resuelve después). icasas no opera en Perú: usar Mercado Libre Perú."
-    zonas: []
+    notas: "Perú; distrito exacto pendiente (el usuario lo resuelve). Se entrega oferta de departamentos en venta de Lima como referencia (primeras 100 págs de InfoCasas)."
+    zonas: [pe-lima]
 
   - folios: [4SR-NRE-02650]
     nombre: OV HÉCTOR MARROQUÍN
@@ -321,7 +335,8 @@ proyectos:
   - folios: [4SR-PER-02646]
     nombre: SENDA - AV. UNIVERSITARIA
     pais: PE
-    prioridad: 9
+    prioridad: 4
     responsable: Valentina
     alcance: "(sin alcance definido en la hoja)"
-    zonas: []
+    notas: "Perú (Av. Universitaria, Lima). Alcance vacío en la hoja: se entrega la misma referencia de oferta de departamentos de Lima que Los Incas."
+    zonas: [pe-lima]

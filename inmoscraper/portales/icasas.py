@@ -37,7 +37,7 @@ MUNICIPIOS = {  # (estado, slug) -> id   (descubiertos en el índice del propio 
     ("jalisco", "chapala"): 548, ("jalisco", "guadalajara"): 568, ("jalisco", "jocotepec"): 578,
     ("jalisco", "tlajomulco-zuniga"): 625, ("jalisco", "tonala"): 629, ("jalisco", "zapopan"): 647,
     ("mexico", "metepec"): 709,
-    ("guanajuato", "san-miguel-allende"): 319,
+    ("guanajuato", "san-miguel-allende"): 319, ("guanajuato", "leon-aldama"): 338,
     ("queretaro", "corregidora"): 1784, ("queretaro", "marques"): 1785,
     ("queretaro", "santiago-queretaro"): 2452,
     ("quintana-roo", "benito-juarez"): 1798, ("quintana-roo", "cancun"): 2473,
