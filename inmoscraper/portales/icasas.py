@@ -28,7 +28,7 @@ TIPOS = {  # nombre -> (slug, categoría, tipo)
 }
 ESTADOS = {  # slug -> id
     "distrito-federal": 1, "coahuila": 8, "guanajuato": 11, "jalisco": 14, "mexico": 15,
-    "nuevo-leon": 19, "queretaro": 22, "quintana-roo": 23, "yucatan": 31,
+    "nuevo-leon": 19, "puebla": 21, "queretaro": 22, "sonora": 26, "quintana-roo": 23, "yucatan": 31,
 }
 MUNICIPIOS = {  # (estado, slug) -> id   (descubiertos en el índice del propio sitio)
     ("distrito-federal", "alvaro-obregon"): 264, ("distrito-federal", "benito-juarez"): 266,
@@ -43,7 +43,7 @@ MUNICIPIOS = {  # (estado, slug) -> id   (descubiertos en el índice del propio 
     ("quintana-roo", "benito-juarez"): 1798, ("quintana-roo", "cancun"): 2473,
     ("quintana-roo", "playa-carmen"): 2499, ("quintana-roo", "playacar"): 2736,
     ("yucatan", "merida"): 2337,
-    ("coahuila", "torreon"): 65,
+    ("coahuila", "torreon"): 65, ("puebla", "puebla"): 1678, ("sonora", "hermosillo"): 1913,
     ("nuevo-leon", "monterrey"): 983, ("nuevo-leon", "santiago"): 992,
     ("nuevo-leon", "san-pedro-garza-garcia"): 990,
 }

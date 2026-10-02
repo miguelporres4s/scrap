@@ -18,9 +18,10 @@ from .infocasas import InfoCasas
 from .inmopanama import InmoPanama
 from .mercadolibre import MercadoLibre
 from .navent import Navent
+from .nuroa import Nuroa
 from .supercasas import SuperCasas
 
-ADAPTADORES: list[type[Portal]] = [Airbnb, Icasas, InfoCasas, MercadoLibre, SuperCasas, EasyBroker, GrupoSucasa, InmoPanama, Navent, Booking]
+ADAPTADORES: list[type[Portal]] = [Airbnb, Nuroa, Icasas, InfoCasas, MercadoLibre, SuperCasas, EasyBroker, GrupoSucasa, InmoPanama, Navent, Booking]
 
 
 def cargar_config_portales(ruta: Optional[str | Path]) -> dict[str, dict[str, Any]]:

@@ -184,6 +184,45 @@ zonas:
     fuentes:
       - {portal: airbnb, etiqueta: Airbnb San Miguel de Allende, operacion: hospedaje, url: "https://www.airbnb.mx/s/San-Miguel-de-Allende--Guanajuato--M%C3%A9xico/homes"}
 
+  # ================================ ECUADOR / HONDURAS =========================
+  ec-zentra:
+    nombre: Guayaquil (Samborondón, Daule, Vía a Daule, Vía a la Costa) - industrial
+    pais: EC
+    fuentes:
+      # Nuroa es un agregador (reúne anuncios de varios portales) con búsqueda por texto libre: la búsqueda necesita
+      # "guayaquil" delante de la zona. Trae ruido y traslapes entre búsquedas: filtra por Ubicación/Tipo en Excel.
+      # Plusvalía, Encuentra24 y Mercado Libre Ecuador están tras Cloudflare/login.
+      - {portal: nuroa, etiqueta: Nuroa venta bodega guayaquil-samborondon, operacion: venta, max_paginas: 12, url: "https://www.nuroa.com.ec/venta/bodega-guayaquil-samborondon"}
+      - {portal: nuroa, etiqueta: Nuroa venta bodega guayaquil-daule, operacion: venta, max_paginas: 12, url: "https://www.nuroa.com.ec/venta/bodega-guayaquil-daule"}
+      - {portal: nuroa, etiqueta: Nuroa venta bodega guayaquil-via-daule, operacion: venta, max_paginas: 12, url: "https://www.nuroa.com.ec/venta/bodega-guayaquil-via-daule"}
+      - {portal: nuroa, etiqueta: Nuroa venta bodega guayaquil-via-costa, operacion: venta, max_paginas: 12, url: "https://www.nuroa.com.ec/venta/bodega-guayaquil-via-costa"}
+      - {portal: nuroa, etiqueta: Nuroa venta galpon guayaquil-samborondon, operacion: venta, max_paginas: 12, url: "https://www.nuroa.com.ec/venta/galpon-guayaquil-samborondon"}
+      - {portal: nuroa, etiqueta: Nuroa venta galpon guayaquil-daule, operacion: venta, max_paginas: 12, url: "https://www.nuroa.com.ec/venta/galpon-guayaquil-daule"}
+      - {portal: nuroa, etiqueta: Nuroa venta galpon guayaquil-via-daule, operacion: venta, max_paginas: 12, url: "https://www.nuroa.com.ec/venta/galpon-guayaquil-via-daule"}
+      - {portal: nuroa, etiqueta: Nuroa venta galpon guayaquil-via-costa, operacion: venta, max_paginas: 12, url: "https://www.nuroa.com.ec/venta/galpon-guayaquil-via-costa"}
+      - {portal: nuroa, etiqueta: Nuroa venta terreno-industrial guayaquil-samborondon, operacion: venta, max_paginas: 12, url: "https://www.nuroa.com.ec/venta/terreno-industrial-guayaquil-samborondon"}
+      - {portal: nuroa, etiqueta: Nuroa venta terreno-industrial guayaquil-daule, operacion: venta, max_paginas: 12, url: "https://www.nuroa.com.ec/venta/terreno-industrial-guayaquil-daule"}
+      - {portal: nuroa, etiqueta: Nuroa venta terreno-industrial guayaquil-via-daule, operacion: venta, max_paginas: 12, url: "https://www.nuroa.com.ec/venta/terreno-industrial-guayaquil-via-daule"}
+      - {portal: nuroa, etiqueta: Nuroa venta terreno-industrial guayaquil-via-costa, operacion: venta, max_paginas: 12, url: "https://www.nuroa.com.ec/venta/terreno-industrial-guayaquil-via-costa"}
+      - {portal: nuroa, etiqueta: Nuroa alquiler bodega guayaquil-samborondon, operacion: renta, max_paginas: 12, url: "https://www.nuroa.com.ec/alquiler/bodega-guayaquil-samborondon"}
+      - {portal: nuroa, etiqueta: Nuroa alquiler bodega guayaquil-daule, operacion: renta, max_paginas: 12, url: "https://www.nuroa.com.ec/alquiler/bodega-guayaquil-daule"}
+      - {portal: nuroa, etiqueta: Nuroa alquiler bodega guayaquil-via-daule, operacion: renta, max_paginas: 12, url: "https://www.nuroa.com.ec/alquiler/bodega-guayaquil-via-daule"}
+      - {portal: nuroa, etiqueta: Nuroa alquiler bodega guayaquil-via-costa, operacion: renta, max_paginas: 12, url: "https://www.nuroa.com.ec/alquiler/bodega-guayaquil-via-costa"}
+      - {portal: nuroa, etiqueta: Nuroa alquiler galpon guayaquil-samborondon, operacion: renta, max_paginas: 12, url: "https://www.nuroa.com.ec/alquiler/galpon-guayaquil-samborondon"}
+      - {portal: nuroa, etiqueta: Nuroa alquiler galpon guayaquil-daule, operacion: renta, max_paginas: 12, url: "https://www.nuroa.com.ec/alquiler/galpon-guayaquil-daule"}
+      - {portal: nuroa, etiqueta: Nuroa alquiler galpon guayaquil-via-daule, operacion: renta, max_paginas: 12, url: "https://www.nuroa.com.ec/alquiler/galpon-guayaquil-via-daule"}
+      - {portal: nuroa, etiqueta: Nuroa alquiler galpon guayaquil-via-costa, operacion: renta, max_paginas: 12, url: "https://www.nuroa.com.ec/alquiler/galpon-guayaquil-via-costa"}
+
+  puebla-vertical:
+    nombre: Heroica Puebla de Zaragoza - departamentos en venta (referencia)
+    pais: MX
+    fuentes: [{portal: icasas, estado: puebla, municipio: puebla, operaciones: [venta], tipos: [departamentos]}]
+
+  hermosillo:
+    nombre: Hermosillo, Sonora (Bahía de Kino pertenece a este municipio) - vivienda y locales en venta (referencia)
+    pais: MX
+    fuentes: [{portal: icasas, estado: sonora, municipio: hermosillo, operaciones: [venta], tipos: [casas, casas-condominio, casas-fraccionamiento, departamentos, locales]}]
+
   merida-vivienda:
     nombre: Mérida, Yucatán - vivienda horizontal en venta (referencia)
     pais: MX
@@ -366,3 +405,35 @@ proyectos:
     alcance: "(sin alcance definido en la hoja)"
     notas: "Perú (Av. Universitaria, Lima). Alcance vacío en la hoja: se entrega la misma referencia de oferta de departamentos de Lima que Los Incas."
     zonas: [pe-lima]
+
+  - folios: [4SR-ECU-02617]
+    nombre: ZENTRA
+    pais: EC
+    prioridad: 4
+    alcance: "Estudio de Oferta industrial: bodegas, ofibodegas y terrenos. Zonas: Samborondón, Daule, Vía a Daule, Vía a la Costa (Guayaquil, Ecuador)."
+    notas: "Fuente: Nuroa Ecuador (agregador). Tope de 8 páginas por búsqueda (~200 anuncios más relevantes)."
+    zonas: [ec-zentra]
+
+  - folios: [4SR-HON-02630]
+    nombre: CUMBRE
+    pais: HN
+    prioridad: 9
+    alcance: "Oferta vertical en Honduras: sin levantamiento de campo, benchmark de proyectos similares (vertical premium ~15 unidades). Demanda: encuestas digitales + 10 entrevistas a la base del cliente."
+    notas: "Sin datos de portales: los portales de Honduras accesibles están tras Cloudflare. El benchmark de proyectos similares se arma manualmente."
+    zonas: []
+
+  - folios: [4SR-SUR-02623]
+    nombre: BAUTISTA ARQUITECTOS - SIRIO
+    pais: MX
+    prioridad: 4
+    alcance: "Estudio de DEMANDA en Heroica Puebla de Zaragoza: vivienda vertical en venta para usuarios e inversionistas (10-15 entrevistas)."
+    notas: "Alcance solo de demanda: se entrega como referencia la oferta de departamentos en venta de Puebla (icasas)."
+    zonas: [puebla-vertical]
+
+  - folios: [4SR-NRO-02373]
+    nombre: CODE - KINO
+    pais: MX
+    prioridad: 4
+    alcance: "Estudio de DEMANDA en Hermosillo, Sonora: compra de vivienda y equipamiento comercial (mercado nacional/extranjeros); análisis demográfico, NSE y estimación de demanda. No hay oferta en Bahía de Kino."
+    notas: "Alcance solo de demanda: se entrega como referencia la oferta de vivienda y locales en venta de Hermosillo (icasas)."
+    zonas: [hermosillo]

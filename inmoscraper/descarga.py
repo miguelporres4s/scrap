@@ -39,6 +39,10 @@ _SENALES_BLOQUEO = (
 )
 
 
+# Sitios que dejan de mostrar anuncios a una sesión con cookies tras varias búsquedas (agregadores)
+HOSTS_SIN_COOKIES = ("nuroa.",)
+
+
 class Bloqueado(Exception):
     """El portal devolvió una página de desafío / anti-bot."""
 
@@ -121,6 +125,8 @@ class Descargador:
         ultimo_error: Optional[Exception] = None
         for intento in range(1, self.a.reintentos + 1):
             self._pausar()
+            if any(h in url for h in HOSTS_SIN_COOKIES):
+                self._sesion.cookies.clear()
             try:
                 r = self._sesion.get(url, timeout=self.a.timeout)
             except requests.RequestException as e:
@@ -129,6 +135,12 @@ class Descargador:
                 time.sleep(2**intento)
                 continue
             r.encoding = r.encoding or r.apparent_encoding
+            if (any(h in url for h in HOSTS_SIN_COOKIES) and "page=" not in url and r.status_code == 200
+                    and "nu_flat_" not in r.text and intento < self.a.reintentos):
+                # agregador que devuelve una primera página vacía cuando limita el ritmo: esperar y reintentar
+                log.info("Página vacía en %s; espero 20 s y reintento (%s/%s)", url, intento, self.a.reintentos)
+                time.sleep(20)
+                continue
             if parece_bloqueo(r.status_code, r.text, r.url):
                 raise Bloqueado(f"HTTP {r.status_code} en {url}" + (f" (redirigido a {r.url[:80]})" if r.url != url else ""))
             if r.status_code == 404:
