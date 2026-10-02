@@ -22,6 +22,16 @@ _TIPOS = [("terreno", "Terreno"), ("lote", "Terreno"), ("galp", "Galpón"), ("of
           ("departamento", "Departamento"), ("suite", "Departamento"), ("casa", "Casa"), ("villa", "Casa")]
 
 
+def _operacion(titulo: str, desc: str, por_url: str) -> str:
+    """Nuroa mezcla alquileres en búsquedas de venta: manda el texto del anuncio."""
+    t = f"{titulo} {desc[:120]}".lower()
+    if re.search(r"\b(alquil|arriend|renta)", t):
+        return "renta"
+    if re.search(r"\b(vend|venta)", t):
+        return "venta"
+    return por_url
+
+
 def _tipo(texto: str) -> str:
     t = texto.lower()
     return next((v for k, v in _TIPOS if k in t), "")
@@ -71,7 +81,7 @@ class Nuroa(Portal):
                     titulo=titulo, precio=parse_float(precio_nodo.get("content")) if precio_nodo else None,
                     moneda=(mon_nodo.get("content") if mon_nodo else "") or self.moneda_defecto,
                     precio_texto=limpiar(precio_nodo.get_text()) if precio_nodo else "",
-                    operacion=op, tipo=_tipo(titulo + " " + desc[:80]),
+                    operacion=_operacion(titulo, desc, op), tipo=_tipo(titulo + " " + desc[:80]),
                     ubicacion=limpiar((c.select_one(".nu_address_text") or c).get_text(" ")) if c.select_one(".nu_address_text") else "",
                     lat=parse_float(mapa.get("data-lat")) if mapa else None,
                     lon=parse_float(mapa.get("data-lon")) if mapa else None,
