@@ -233,3 +233,31 @@ def escribir_excels(cat: Catalogo, proyectos: list[Proyecto], carpeta: Path, sal
     ruta_indice = salida / "00_indice_proyectos.xlsx"
     wb.save(ruta_indice)
     return [ruta_indice] + [salida / r["archivo"] for r in resumen]
+
+
+def nombre_carpeta(p: Proyecto) -> str:
+    """Nombre de carpeta válido en Windows: '<folios> - <proyecto>'."""
+    import re
+    base = f"{' + '.join(p.folios)} - {p.nombre}"
+    base = re.sub(r'[<>:"/\\|?*]', "", base).strip(" .")
+    return base[:120]
+
+
+def entregar(cat: Catalogo, proyectos: list[Proyecto], carpeta: Path, salida: Path, destino: Path) -> list[tuple[str, int, int]]:
+    """Copia el Excel de cada proyecto CON datos a ``destino/<folios> - <proyecto>/``.
+    Los proyectos sin anuncios (ni hoteles) no generan carpeta."""
+    import shutil
+    fichas, estado = CacheFichas(carpeta), Estado(carpeta)
+    res = []
+    for p in proyectos:
+        viv, hot = datos_proyecto(p, cat, carpeta, fichas, estado)
+        if not (viv or hot):
+            continue
+        origen = salida / p.archivo
+        if not origen.exists():
+            continue
+        carp = destino / nombre_carpeta(p)
+        carp.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(origen, carp / origen.name)
+        res.append((carp.name, len(viv), len(hot)))
+    return res

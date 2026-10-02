@@ -162,6 +162,15 @@ def cmd_proyectos(args) -> int:
                 pr.ejecutar_fichas(cat, sel, ajustes, base, max_fichas=args.max_fichas,
                                    config_portales=portales, desc=desc, solo_portal=args.fichas_portal)
     archivos = escribir_excels(cat, sel, base, salida)
+    if args.entrega:
+        from .excel_proyectos import entregar
+        hechos = entregar(cat, sel, base, salida, Path(args.entrega))
+        print(f"\nCarpetas por proyecto en {args.entrega} (solo proyectos con información):")
+        for nombre, v, h in hechos:
+            print(f"   {nombre}  ({v} anuncios" + (f", {h} hoteles" if h else "") + ")")
+        omitidos = len(sel) - len(hechos)
+        if omitidos:
+            print(f"   ({omitidos} proyectos sin información: no se creó carpeta)")
     est = pr.Estado(base)
     print("\nEstado de las fuentes")
     mostradas = set()
@@ -239,6 +248,8 @@ def construir_parser() -> argparse.ArgumentParser:
     pj.add_argument("--fichas-portal", help="solo fichas de las fuentes cuyo id empiece así (p. ej. icasas-pa, rentahouserd); "
                                             "permite correr varios portales en paralelo en terminales distintas")
     pj.add_argument("--max-fichas", type=int, help="tope de fichas por corrida (se reanuda con la caché)")
+    pj.add_argument("--entrega", help="carpeta destino: crea una subcarpeta por proyecto (solo los que tienen datos) con su Excel, "
+                                      "p. ej. --entrega \"C:\\AAAATRABAJO\\4s_Realstates\\proyec\\10\"")
     pj.add_argument("--solo-excel", action="store_true", help="no descarga nada, regenera los Excel con lo ya descargado")
     pj.add_argument("--rehacer", action="store_true", help="vuelve a scrapear fuentes ya completas")
     pj.add_argument("--datos", help="carpeta de datos intermedios (default: datos)")
