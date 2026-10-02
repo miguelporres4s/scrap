@@ -172,6 +172,17 @@ zonas:
       # cambiar la URL por la del distrito (ej. .../venta/departamentos/lima/<distrito>) y subir max_paginas.
       - {portal: infocasas, etiqueta: InfoCasas Lima departamentos venta, operacion: venta, tipo: departamentos, max_paginas: 100, url: "https://infocasas.com.pe/venta/departamentos/lima"}
 
+  pe-miraflores:
+    nombre: Miraflores, Lima - departamentos en venta (InfoCasas)
+    pais: PE
+    fuentes:
+      - {portal: infocasas, etiqueta: InfoCasas Miraflores departamentos venta, operacion: venta, tipo: departamentos, max_paginas: 210, url: "https://infocasas.com.pe/venta/departamentos/lima/miraflores"}
+
+  merida-vivienda:
+    nombre: Mérida, Yucatán - vivienda horizontal en venta (referencia)
+    pais: MX
+    fuentes: [{portal: icasas, estado: yucatan, municipio: merida, operaciones: [venta], tipos: [casas, casas-condominio, casas-fraccionamiento]}]
+
   nl-santiago:
     nombre: "Santiago, Nuevo León (SUPUESTO: folio NRE; confirmar)"
     pais: MX
@@ -311,8 +322,8 @@ proyectos:
     pais: MX
     prioridad: 9
     alcance: "Estudio de demanda: vivienda horizontal con preferencias comerciales (8 semanas)."
-    notas: "Solo demanda (encuestas)."
-    zonas: []
+    notas: "El alcance es solo DEMANDA (encuestas): no hay oferta de portales que entregar. Se incluye como referencia la oferta de vivienda horizontal en venta de Mérida (icasas). Ojo: icasas limita las casas de Mérida a 100 páginas."
+    zonas: [merida-vivienda]
 
   - folios: [4SR-PER-02624]
     nombre: LOS INCAS 498
@@ -320,8 +331,8 @@ proyectos:
     prioridad: 4
     responsable: Valentina
     alcance: "Demanda: vivienda vertical, 70 encuestas efectivas; bonus Ciudaris (predefinición de producto en 5 días). Estimación de demanda por giro (vivienda vertical, comercio y oficinas)."
-    notas: "Perú; distrito exacto pendiente (el usuario lo resuelve). Se entrega oferta de departamentos en venta de Lima como referencia (primeras 100 págs de InfoCasas)."
-    zonas: [pe-lima]
+    notas: "Perú. Miraflores, Lima (confirmado por el usuario): departamentos en venta de Miraflores (InfoCasas)."
+    zonas: [pe-miraflores]
 
   - folios: [4SR-NRE-02650]
     nombre: OV HÉCTOR MARROQUÍN
