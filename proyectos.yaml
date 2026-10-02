@@ -178,6 +178,12 @@ zonas:
     fuentes:
       - {portal: infocasas, etiqueta: InfoCasas Miraflores departamentos venta, operacion: venta, tipo: departamentos, max_paginas: 210, url: "https://infocasas.com.pe/venta/departamentos/lima/miraflores"}
 
+  sma-airbnb:
+    nombre: San Miguel de Allende - Airbnb (búsqueda pública, dividida por bandas de precio)
+    pais: MX
+    fuentes:
+      - {portal: airbnb, etiqueta: Airbnb San Miguel de Allende, operacion: hospedaje, url: "https://www.airbnb.mx/s/San-Miguel-de-Allende--Guanajuato--M%C3%A9xico/homes"}
+
   merida-vivienda:
     nombre: Mérida, Yucatán - vivienda horizontal en venta (referencia)
     pais: MX
@@ -230,6 +236,15 @@ proyectos:
     responsable: Jorge
     alcance: "Oferta: Vertical, Horizontal, Branded Residences, Hotel (Booking; sin Airbnb)."
     zonas: [sma, sma-hoteles]
+
+  - folios: [4SR-BAJ-02631-AIRBNB]
+    nombre: ST REGIS - SMA (Airbnb)
+    pais: MX
+    prioridad: 3
+    responsable: Jorge
+    alcance: "Hotel/Airbnb de San Miguel de Allende (giro 'Hotel/Airbnb' del alcance de St. Regis). Solicitado por el usuario: todos los Airbnb de SMA."
+    notas: "Archivo complementario del folio 4SR-BAJ-02631: va en la misma carpeta de St. Regis. Fuente: búsqueda pública de Airbnb (no AirDNA: es de pago y requiere login)."
+    zonas: [sma-airbnb]
 
   - folios: [4SR-BAJ-02634]
     nombre: SUPRATERRA - SMA

@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 
 import yaml
 
+from .airbnb import Airbnb
 from .base import Portal
 from .booking import Booking
 from .easybroker import EasyBroker
@@ -19,7 +20,7 @@ from .mercadolibre import MercadoLibre
 from .navent import Navent
 from .supercasas import SuperCasas
 
-ADAPTADORES: list[type[Portal]] = [Icasas, InfoCasas, MercadoLibre, SuperCasas, EasyBroker, GrupoSucasa, InmoPanama, Navent, Booking]
+ADAPTADORES: list[type[Portal]] = [Airbnb, Icasas, InfoCasas, MercadoLibre, SuperCasas, EasyBroker, GrupoSucasa, InmoPanama, Navent, Booking]
 
 
 def cargar_config_portales(ruta: Optional[str | Path]) -> dict[str, dict[str, Any]]:

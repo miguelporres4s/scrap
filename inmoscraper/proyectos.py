@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import csv
 import json
+from datetime import datetime
 import logging
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -165,6 +166,9 @@ def ejecutar_listados(cat: Catalogo, proyectos: list[Proyecto], ajustes: Ajustes
                 log.info("(%s/%s) %s ya está completa, la salto", i, len(unidades), u.id)
                 continue
             log.info("(%s/%s) %s%s", i, len(unidades), u.id, "  [URL por verificar]" if u.verificar else "")
+            if u.portal == "airbnb":
+                estado.guardar(u, _descargar_airbnb(u, desc, carpeta))
+                continue
             z = Zona(nombre=u.id, url=u.url, pais=u.pais, max_paginas=u.max_paginas)
             r = scrapear_zona(z, desc, carpeta / "unidades", modo_global=ajustes.modo,
                               max_paginas=max_paginas, config_portales=config_portales)
@@ -175,6 +179,31 @@ def ejecutar_listados(cat: Catalogo, proyectos: list[Proyecto], ajustes: Ajustes
         if propio:
             desc.cerrar()
     return estado
+
+
+def _descargar_airbnb(u: Unidad, desc: Descargador, carpeta: Path) -> Resultado:
+    from .exportar import guardar_csv
+    from .portales.airbnb import descargar
+    ruta = ruta_unidad(carpeta, u)
+    r = Resultado(zona=u.id, portal=u.portal, url=u.url, archivo=str(ruta))
+    try:
+        anuncios, info = descargar(u.url, desc.http, log=log.info)
+        for a in anuncios:
+            a.zona, a.pais = u.id, u.pais
+        guardar_csv(anuncios, ruta)
+        r.anuncios, r.paginas, r.estado = len(anuncios), info["consultas"], "ok"
+        if info["bandas_saturadas_sin_resolver"]:
+            r.estado = "parcial"
+            r.detalle = f"bandas de precio saturadas (>270 resultados) sin poder dividir más: {info['bandas_saturadas_sin_resolver']}"
+        else:
+            r.detalle = "Airbnb limita cada búsqueda a 270 resultados; se dividió por precio. Puede faltar algún anuncio por traslapes entre páginas."
+    except Bloqueado as e:
+        r.estado, r.detalle = "bloqueado", str(e)
+    except Exception as e:  # noqa: BLE001
+        r.estado, r.detalle = "error", f"{type(e).__name__}: {e}"
+        log.exception("error en %s", u.id)
+    r.fin = datetime.now().isoformat(timespec="seconds")
+    return r
 
 
 # -------------------------------------------------------------------- fichas
